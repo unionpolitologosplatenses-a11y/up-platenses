@@ -1,0 +1,66 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getEnv, type Edition } from '../../../lib/db';
+import { fileUrl } from '../../../lib/r2';
+
+const env = getEnv(Astro);
+const { id } = Astro.params;
+const edition = await env.DB.prepare('SELECT * FROM editions WHERE id = ?').bind(id).first<Edition>();
+
+if (!edition) return Astro.redirect('/admin/revista');
+---
+<AdminLayout title={`Editar — Edición ${edition.number}`}>
+  <a href="/admin/revista" class="text-sm text-ink/50 hover:text-esmeralda">← Revista</a>
+  <h1 class="mt-3 text-2xl font-semibold">Editar edición</h1>
+
+  <form method="POST" action={`/api/editions/${edition.id}/update`} enctype="multipart/form-data" class="mt-8 space-y-5">
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="number" class="field-label">Número de edición</label>
+        <input id="number" name="number" type="number" min="1" required class="field-input" value={edition.number} />
+      </div>
+      <div>
+        <label for="year" class="field-label">Año</label>
+        <input id="year" name="year" type="number" required class="field-input" value={edition.year} />
+      </div>
+    </div>
+
+    <div>
+      <label for="title" class="field-label">Título</label>
+      <input id="title" name="title" required class="field-input" value={edition.title} />
+    </div>
+
+    <div>
+      <label for="description" class="field-label">Descripción</label>
+      <textarea id="description" name="description" rows="3" class="field-input">{edition.description}</textarea>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="cover" class="field-label">Portada (imagen)</label>
+        {edition.cover_key && <img src={fileUrl(edition.cover_key)} alt="" class="mb-2 h-32 w-24 rounded-sm object-cover" />}
+        <input id="cover" name="cover" type="file" accept="image/*" class="field-input" />
+        <p class="mt-1 text-xs text-ink/45">Dejar vacío para conservar la portada actual.</p>
+      </div>
+      <div>
+        <label for="pdf" class="field-label">Archivo PDF</label>
+        {edition.pdf_key && (
+          <a href={fileUrl(edition.pdf_key)} target="_blank" class="mb-2 block text-sm text-esmeralda hover:underline">Ver PDF actual</a>
+        )}
+        <input id="pdf" name="pdf" type="file" accept="application/pdf" class="field-input" />
+        <p class="mt-1 text-xs text-ink/45">Dejar vacío para conservar el PDF actual.</p>
+      </div>
+    </div>
+
+    <div>
+      <label for="status" class="field-label">Estado</label>
+      <select id="status" name="status" class="field-input">
+        <option value="draft" selected={edition.status === 'draft'}>Borrador</option>
+        <option value="published" selected={edition.status === 'published'}>Publicada</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn-primary">Guardar cambios</button>
+  </form>
+</AdminLayout>

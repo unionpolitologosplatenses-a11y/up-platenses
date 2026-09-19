@@ -1,0 +1,37 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getEnv, type Edition } from '../../../lib/db';
+
+const env = getEnv(Astro);
+const { results: editions } = await env.DB.prepare(`SELECT * FROM editions ORDER BY year DESC, number DESC`).all<Edition>();
+---
+<AdminLayout title="Revista">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-semibold">Revista</h1>
+    <a href="/admin/revista/nueva" class="btn-primary">+ Nueva edición</a>
+  </div>
+
+  <div class="mt-8 divide-y divide-ink/10 rounded-sm border border-ink/10 bg-white">
+    {editions.length === 0 && <p class="p-6 text-sm text-ink/50">No hay ediciones todavía.</p>}
+    {editions.map((edition) => (
+      <div class="flex flex-wrap items-center justify-between gap-3 p-5">
+        <div>
+          <p class="font-medium text-ink">Edición {edition.number} — {edition.year}: {edition.title}</p>
+          <p class="mt-0.5 text-xs text-ink/50">
+            {edition.pdf_key ? 'PDF cargado' : 'Sin PDF'} ·{' '}
+            <span class:list={[edition.status === 'published' ? 'text-esmeralda' : 'text-fucsia']}>
+              {edition.status === 'published' ? 'Publicada' : 'Borrador'}
+            </span>
+          </p>
+        </div>
+        <div class="flex gap-3 text-sm">
+          <a href={`/admin/revista/${edition.id}`} class="font-medium text-esmeralda hover:underline">Editar</a>
+          <form method="POST" action={`/api/editions/${edition.id}/delete`} onsubmit="return confirm('¿Eliminar esta edición?')">
+            <button type="submit" class="font-medium text-fucsia hover:underline">Eliminar</button>
+          </form>
+        </div>
+      </div>
+    ))}
+  </div>
+</AdminLayout>

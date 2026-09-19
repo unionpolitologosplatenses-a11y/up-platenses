@@ -1,0 +1,58 @@
+---
+export const prerender = false;
+import Layout from '../../layouts/Layout.astro';
+import { getEnv, type Edition } from '../../lib/db';
+import { fileUrl } from '../../lib/r2';
+
+const env = getEnv(Astro);
+const { id } = Astro.params;
+
+const edition = await env.DB.prepare(
+  `SELECT * FROM editions WHERE id = ? AND status = 'published'`
+).bind(id).first<Edition>();
+
+if (!edition) {
+  return Astro.redirect('/revista');
+}
+
+const pdfSrc = fileUrl(edition.pdf_key);
+---
+<Layout title={`Edición ${edition.number} — ${edition.year}`} description={edition.description || edition.title}>
+  <section class="container-up pt-16 md:pt-24">
+    <a href="/revista" class="text-sm font-medium text-ink/50 hover:text-esmeralda">← Revista</a>
+
+    <div class="mt-8 grid gap-10 md:grid-cols-[220px_1fr]">
+      <div class="aspect-[3/4] overflow-hidden bg-esmeralda-light">
+        {edition.cover_key && (
+          <img src={fileUrl(edition.cover_key)} alt={`Portada — Edición ${edition.number}`} class="h-full w-full object-cover" />
+        )}
+      </div>
+
+      <div>
+        <p class="text-sm font-medium text-fucsia">Edición {edition.number} — {edition.year}</p>
+        <h1 class="mt-2 text-3xl leading-tight text-ink md:text-4xl">{edition.title}</h1>
+        {edition.description && (
+          <p class="mt-4 max-w-prose leading-relaxed text-ink/70">{edition.description}</p>
+        )}
+        {edition.pdf_key && (
+          <div class="mt-7 flex flex-wrap gap-4">
+            <a href={pdfSrc} target="_blank" rel="noopener" class="btn-primary">Leer en el navegador</a>
+            <a href={pdfSrc} download class="btn-secondary">Descargar PDF</a>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  {edition.pdf_key && (
+    <section class="container-up mt-14 mb-32">
+      <div class="overflow-hidden rounded-sm border border-ink/10">
+        <iframe
+          src={pdfSrc}
+          title={`PDF — Edición ${edition.number}`}
+          class="h-[80vh] w-full"
+        ></iframe>
+      </div>
+    </section>
+  )}
+</Layout>

@@ -1,0 +1,40 @@
+---
+export const prerender = false;
+import Layout from '../layouts/Layout.astro';
+import { getEnv, type Institutional } from '../lib/db';
+
+const env = getEnv(Astro);
+const institutional = await env.DB.prepare('SELECT * FROM institutional WHERE id = 1').first<Institutional>();
+---
+<Layout title="Contacto" description="Contactate con la Unión de Politólogos Platenses.">
+  <section class="container-up pt-16 pb-32 md:pt-24">
+    <div class="up-rule mb-8"><span class="seg-1"></span><span class="seg-2"></span><span class="seg-3"></span></div>
+    <h1 class="max-w-2xl text-4xl leading-[1.1] text-ink md:text-5xl">Contacto</h1>
+    <p class="mt-4 max-w-lg text-ink/65">
+      ¿Querés sumarte, proponer una nota o consultar sobre la revista? Escribinos.
+    </p>
+
+    <div class="mt-14 grid gap-10 md:grid-cols-2">
+      <div class="space-y-6">
+        <div>
+          <p class="text-sm font-semibold text-esmeralda">Correo electrónico</p>
+          <a href={`mailto:${institutional?.contact_email}`} class="mt-1 block text-lg text-ink hover:text-esmeralda">
+            {institutional?.contact_email || 'contacto@upplatenses.org'}
+          </a>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-esmeralda">Sede</p>
+          <p class="mt-1 text-lg text-ink">{institutional?.contact_address || 'La Plata, Buenos Aires, Argentina'}</p>
+        </div>
+      </div>
+
+      <div class="border-l-2 border-esmeralda/20 pl-6">
+        <p class="text-ink/70 leading-relaxed">
+          También podés seguir nuestras actividades y publicaciones a través de las secciones
+          <a href="/notas" class="text-esmeralda hover:underline">Notas</a> y
+          <a href="/revista" class="text-esmeralda hover:underline">Revista</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>

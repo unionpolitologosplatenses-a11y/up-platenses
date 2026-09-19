@@ -1,0 +1,63 @@
+---
+export const prerender = false;
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getEnv, type Note } from '../../../lib/db';
+import { fileUrl } from '../../../lib/r2';
+
+const env = getEnv(Astro);
+const { id } = Astro.params;
+const note = await env.DB.prepare('SELECT * FROM notes WHERE id = ?').bind(id).first<Note>();
+
+if (!note) return Astro.redirect('/admin/notas');
+---
+<AdminLayout title={`Editar — ${note.title}`}>
+  <a href="/admin/notas" class="text-sm text-ink/50 hover:text-esmeralda">← Notas</a>
+  <h1 class="mt-3 text-2xl font-semibold">Editar nota</h1>
+
+  <form method="POST" action={`/api/notes/${note.id}/update`} enctype="multipart/form-data" class="mt-8 space-y-5">
+    <div>
+      <label for="title" class="field-label">Título</label>
+      <input id="title" name="title" required class="field-input" value={note.title} />
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="author" class="field-label">Autor</label>
+        <input id="author" name="author" class="field-input" value={note.author} />
+      </div>
+      <div>
+        <label for="note_date" class="field-label">Fecha</label>
+        <input id="note_date" name="note_date" type="date" value={note.note_date} required class="field-input" />
+      </div>
+    </div>
+
+    <div>
+      <label for="image" class="field-label">Imagen</label>
+      {note.image_key && (
+        <img src={fileUrl(note.image_key)} alt="" class="mb-2 h-28 w-44 rounded-sm object-cover" />
+      )}
+      <input id="image" name="image" type="file" accept="image/*" class="field-input" />
+      <p class="mt-1 text-xs text-ink/45">Dejar vacío para conservar la imagen actual.</p>
+    </div>
+
+    <div>
+      <label for="excerpt" class="field-label">Copete (resumen breve)</label>
+      <textarea id="excerpt" name="excerpt" rows="2" class="field-input">{note.excerpt}</textarea>
+    </div>
+
+    <div>
+      <label for="content" class="field-label">Contenido</label>
+      <textarea id="content" name="content" rows="14" required class="field-input">{note.content}</textarea>
+    </div>
+
+    <div>
+      <label for="status" class="field-label">Estado</label>
+      <select id="status" name="status" class="field-input">
+        <option value="draft" selected={note.status === 'draft'}>Borrador</option>
+        <option value="published" selected={note.status === 'published'}>Publicada</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn-primary">Guardar cambios</button>
+  </form>
+</AdminLayout>

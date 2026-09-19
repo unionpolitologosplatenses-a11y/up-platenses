@@ -1,0 +1,51 @@
+---
+export const prerender = false;
+import Layout from '../layouts/Layout.astro';
+import { getEnv, type Institutional } from '../lib/db';
+
+const env = getEnv(Astro);
+const institutional = await env.DB.prepare('SELECT * FROM institutional WHERE id = 1').first<Institutional>();
+
+const objectives = (institutional?.objectives ?? '')
+  .split('\n').map((o) => o.trim()).filter(Boolean);
+---
+<Layout title="La Unión" description="Misión y objetivos de la Unión de Politólogos Platenses.">
+  <section class="container-up pt-16 md:pt-24">
+    <div class="up-rule mb-8"><span class="seg-1"></span><span class="seg-2"></span><span class="seg-3"></span></div>
+    <h1 class="max-w-2xl text-4xl leading-[1.1] text-ink md:text-5xl">La Unión</h1>
+  </section>
+
+  <section class="container-up mt-14 grid gap-14 md:mt-20 md:grid-cols-[1fr_1fr]">
+    <div>
+      <h2 class="text-sm font-semibold text-esmeralda">Misión</h2>
+      <p class="mt-4 max-w-prose text-lg leading-relaxed text-ink/75">
+        {institutional?.mission ||
+          'Nuclear a politólogos y especialistas en Relaciones Internacionales de La Plata para fortalecer el intercambio académico y profesional en la región.'}
+      </p>
+    </div>
+
+    {objectives.length > 0 && (
+      <div>
+        <h2 class="text-sm font-semibold text-esmeralda">Objetivos</h2>
+        <ul class="mt-4 space-y-4">
+          {objectives.map((obj) => (
+            <li class="flex gap-3 border-b border-ink/10 pb-4 text-ink/75">
+              <span class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-fucsia"></span>
+              <span class="leading-relaxed">{obj}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </section>
+
+  <section class="container-up mt-24 mb-32 md:mt-32">
+    <div class="rounded-sm border border-ink/10 bg-white p-10 text-center md:p-14">
+      <p class="text-2xl font-medium text-esmeralda">Unir, Potenciar y Profesionalizar</p>
+      <p class="mx-auto mt-3 max-w-md text-sm text-ink/60">
+        Así entendemos nuestro rol: como punto de encuentro para quienes piensan y hacen política desde La Plata.
+      </p>
+      <a href="/contacto" class="btn-primary mt-7 inline-flex">Sumate a la Unión</a>
+    </div>
+  </section>
+</Layout>

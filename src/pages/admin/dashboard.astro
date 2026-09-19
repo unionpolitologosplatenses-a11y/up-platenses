@@ -1,0 +1,34 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getEnv } from '../../lib/db';
+
+const env = getEnv(Astro);
+const notesCount = await env.DB.prepare(`SELECT COUNT(*) as c FROM notes`).first<{ c: number }>();
+const publishedNotes = await env.DB.prepare(`SELECT COUNT(*) as c FROM notes WHERE status='published'`).first<{ c: number }>();
+const editionsCount = await env.DB.prepare(`SELECT COUNT(*) as c FROM editions`).first<{ c: number }>();
+const publishedEditions = await env.DB.prepare(`SELECT COUNT(*) as c FROM editions WHERE status='published'`).first<{ c: number }>();
+---
+<AdminLayout title="Panel">
+  <h1 class="text-2xl font-semibold">Panel</h1>
+  <p class="mt-1 text-sm text-ink/60">Gestioná el contenido del sitio sin tocar código.</p>
+
+  <div class="mt-8 grid gap-4 sm:grid-cols-2">
+    <a href="/admin/notas" class="rounded-sm border border-ink/10 bg-white p-6 hover:border-esmeralda/40">
+      <p class="text-sm font-medium text-ink/50">Notas</p>
+      <p class="mt-1 text-3xl font-semibold text-ink">{notesCount?.c ?? 0}</p>
+      <p class="mt-1 text-xs text-ink/50">{publishedNotes?.c ?? 0} publicadas</p>
+    </a>
+    <a href="/admin/revista" class="rounded-sm border border-ink/10 bg-white p-6 hover:border-esmeralda/40">
+      <p class="text-sm font-medium text-ink/50">Ediciones de revista</p>
+      <p class="mt-1 text-3xl font-semibold text-ink">{editionsCount?.c ?? 0}</p>
+      <p class="mt-1 text-xs text-ink/50">{publishedEditions?.c ?? 0} publicadas</p>
+    </a>
+  </div>
+
+  <div class="mt-10 flex flex-wrap gap-4">
+    <a href="/admin/notas/nueva" class="btn-primary">+ Nueva nota</a>
+    <a href="/admin/revista/nueva" class="btn-secondary">+ Nueva edición</a>
+    <a href="/admin/institucional" class="btn-secondary">Editar info institucional</a>
+  </div>
+</AdminLayout>

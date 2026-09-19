@@ -1,0 +1,23 @@
+name = "up-platenses"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./dist"
+
+# Base de datos D1: guarda notas, ediciones de revista e información institucional.
+# Crear con: wrangler d1 create up_platenses
+# Luego reemplazar "database_id" con el id que devuelve ese comando.
+[[d1_databases]]
+binding = "DB"
+database_name = "up_platenses"
+database_id = "5d25fbd1-6ecf-4739-a8c2-f3393b379ff4"
+
+# Bucket R2: guarda las imágenes de notas, portadas y PDFs de la revista.
+# Crear con: wrangler r2 bucket create up-platenses-files
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "up-platenses-files"
+
+# Secretos (NO se definen acá). Configurar con:
+#   wrangler pages secret put ADMIN_PASSWORD
+#   wrangler pages secret put ADMIN_SECRET
+# o desde el dashboard de Cloudflare Pages > Settings > Environment variables.

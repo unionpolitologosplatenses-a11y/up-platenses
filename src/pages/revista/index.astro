@@ -1,0 +1,30 @@
+---
+export const prerender = false;
+import Layout from '../../layouts/Layout.astro';
+import EditionCard from '../../components/EditionCard.astro';
+import { getEnv, type Edition } from '../../lib/db';
+
+const env = getEnv(Astro);
+const { results: editions } = await env.DB.prepare(
+  `SELECT * FROM editions WHERE status = 'published' ORDER BY year DESC, number DESC`
+).all<Edition>();
+---
+<Layout title="Revista" description="Revista académica de la Unión de Politólogos Platenses.">
+  <section class="container-up pt-16 md:pt-24">
+    <div class="up-rule mb-8"><span class="seg-1"></span><span class="seg-2"></span><span class="seg-3"></span></div>
+    <h1 class="max-w-2xl text-4xl leading-[1.1] text-ink md:text-5xl">Revista UP</h1>
+    <p class="mt-4 max-w-lg text-ink/65">
+      Publicación académica de la Unión de Politólogos Platenses. Todas las ediciones disponibles para leer en línea o descargar.
+    </p>
+  </section>
+
+  <section class="container-up mt-16 mb-32">
+    {editions.length === 0 ? (
+      <p class="text-ink/50">Todavía no hay ediciones publicadas.</p>
+    ) : (
+      <div class="grid gap-5 md:grid-cols-2">
+        {editions.map((edition) => <EditionCard edition={edition} />)}
+      </div>
+    )}
+  </section>
+</Layout>

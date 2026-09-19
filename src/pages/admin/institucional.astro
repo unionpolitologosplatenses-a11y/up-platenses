@@ -1,0 +1,57 @@
+---
+export const prerender = false;
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getEnv, type Institutional } from '../../lib/db';
+
+const env = getEnv(Astro);
+const info = await env.DB.prepare('SELECT * FROM institutional WHERE id = 1').first<Institutional>();
+const updated = Astro.url.searchParams.get('updated');
+---
+<AdminLayout title="Información institucional">
+  <h1 class="text-2xl font-semibold">Información institucional</h1>
+  <p class="mt-1 text-sm text-ink/60">Este contenido aparece en Inicio, La Unión y Contacto.</p>
+
+  {updated && <p class="mt-4 rounded-sm bg-esmeralda-light px-4 py-2.5 text-sm text-esmeralda">Cambios guardados.</p>}
+
+  <form method="POST" action="/api/settings/update" class="mt-8 space-y-5">
+    <div>
+      <label for="home_tagline" class="field-label">Frase institucional (Inicio)</label>
+      <input id="home_tagline" name="home_tagline" class="field-input" value={info?.home_tagline} />
+    </div>
+
+    <div>
+      <label for="home_intro" class="field-label">Presentación breve (Inicio)</label>
+      <textarea id="home_intro" name="home_intro" rows="3" class="field-input">{info?.home_intro}</textarea>
+    </div>
+
+    <div>
+      <label for="mission" class="field-label">Misión (La Unión)</label>
+      <textarea id="mission" name="mission" rows="3" class="field-input">{info?.mission}</textarea>
+    </div>
+
+    <div>
+      <label for="objectives" class="field-label">Objetivos (La Unión)</label>
+      <textarea id="objectives" name="objectives" rows="5" class="field-input">{info?.objectives}</textarea>
+      <p class="mt-1 text-xs text-ink/45">Un objetivo por línea.</p>
+    </div>
+
+    <div>
+      <label for="activities" class="field-label">Actividades principales (Inicio)</label>
+      <textarea id="activities" name="activities" rows="4" class="field-input">{info?.activities}</textarea>
+      <p class="mt-1 text-xs text-ink/45">Una actividad por línea.</p>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="contact_email" class="field-label">Correo de contacto</label>
+        <input id="contact_email" name="contact_email" type="email" class="field-input" value={info?.contact_email} />
+      </div>
+      <div>
+        <label for="contact_address" class="field-label">Sede</label>
+        <input id="contact_address" name="contact_address" class="field-input" value={info?.contact_address} />
+      </div>
+    </div>
+
+    <button type="submit" class="btn-primary">Guardar cambios</button>
+  </form>
+</AdminLayout>

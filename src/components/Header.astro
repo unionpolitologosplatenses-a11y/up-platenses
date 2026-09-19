@@ -1,0 +1,74 @@
+---
+const links = [
+  { href: '/', label: 'Inicio' },
+  { href: '/la-union', label: 'La Unión' },
+  { href: '/notas', label: 'Notas' },
+  { href: '/revista', label: 'Revista' },
+  { href: '/contacto', label: 'Contacto' },
+];
+const current = Astro.url.pathname;
+---
+<header class="sticky top-0 z-40 border-b border-ink/10 bg-paper/90 backdrop-blur">
+  <div class="container-up flex h-20 items-center justify-between">
+    <a href="/" class="flex items-center gap-3">
+      <span class="flex h-9 w-9 items-center justify-center rounded-full bg-esmeralda text-sm font-semibold text-white">
+        UP
+      </span>
+      <span class="leading-tight">
+        <span class="block text-sm font-semibold text-ink">Unión de Politólogos</span>
+        <span class="block text-sm font-semibold text-ink">Platenses</span>
+      </span>
+    </a>
+
+    <nav class="hidden items-center gap-8 md:flex">
+      {links.map((l) => {
+        const active = l.href === '/' ? current === '/' : current.startsWith(l.href);
+        return (
+          <a
+            href={l.href}
+            class:list={[
+              'text-sm font-medium transition-colors',
+              active ? 'text-esmeralda' : 'text-ink/70 hover:text-esmeralda',
+            ]}
+          >
+            {l.label}
+          </a>
+        );
+      })}
+    </nav>
+
+    <button
+      id="menu-toggle"
+      class="flex h-9 w-9 items-center justify-center md:hidden"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+        <line x1="2" y1="6" x2="20" y2="6" />
+        <line x1="2" y1="11" x2="20" y2="11" />
+        <line x1="2" y1="16" x2="20" y2="16" />
+      </svg>
+    </button>
+  </div>
+
+  <nav id="mobile-menu" class="hidden border-t border-ink/10 md:hidden">
+    <div class="container-up flex flex-col py-2">
+      {links.map((l) => (
+        <a href={l.href} class="py-3 text-sm font-medium text-ink/80 hover:text-esmeralda">
+          {l.label}
+        </a>
+      ))}
+    </div>
+  </nav>
+</header>
+
+<script>
+  const btn = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  btn?.addEventListener('click', () => {
+    const isHidden = menu?.classList.contains('hidden');
+    menu?.classList.toggle('hidden');
+    btn.setAttribute('aria-expanded', String(isHidden));
+  });
+</script>

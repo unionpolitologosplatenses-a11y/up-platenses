@@ -1,0 +1,21 @@
+---
+import { fileUrl } from '../lib/r2';
+import type { Edition } from '../lib/db';
+
+interface Props { edition: Edition }
+const { edition } = Astro.props;
+---
+<a href={`/revista/${edition.id}`} class="group flex gap-5 rounded-sm border border-ink/10 p-4 transition-colors hover:border-esmeralda/40">
+  <div class="aspect-[3/4] w-24 flex-shrink-0 overflow-hidden bg-esmeralda-light">
+    {edition.cover_key && (
+      <img src={fileUrl(edition.cover_key)} alt={`Portada — Edición ${edition.number}`} class="h-full w-full object-cover" loading="lazy" />
+    )}
+  </div>
+  <div class="flex flex-col justify-center">
+    <p class="text-xs font-medium text-fucsia">Edición {edition.number} — {edition.year}</p>
+    <h3 class="mt-1 text-base font-medium leading-snug text-ink group-hover:text-esmeralda">{edition.title}</h3>
+    {edition.description && (
+      <p class="mt-1.5 line-clamp-2 text-sm text-ink/60">{edition.description}</p>
+    )}
+  </div>
+</a>

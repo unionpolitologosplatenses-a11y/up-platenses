@@ -1,0 +1,40 @@
+---
+export const prerender = false;
+import '../../styles/global.css';
+
+const error = Astro.url.searchParams.get('error');
+const redirect = Astro.url.searchParams.get('redirect') || '/admin/dashboard';
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Ingresar · Admin UP</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="flex min-h-screen items-center justify-center bg-paper px-6 font-sans text-ink">
+    <div class="w-full max-w-sm">
+      <span class="flex h-10 w-10 items-center justify-center rounded-full bg-esmeralda text-sm font-semibold text-white">UP</span>
+      <h1 class="mt-6 text-2xl font-semibold">Panel de administración</h1>
+      <p class="mt-1 text-sm text-ink/60">Unión de Politólogos Platenses</p>
+
+      {error && (
+        <p class="mt-5 rounded-sm bg-fucsia/10 px-4 py-2.5 text-sm text-fucsia">Contraseña incorrecta.</p>
+      )}
+
+      <form method="POST" action="/api/auth/login" class="mt-8 space-y-4">
+        <input type="hidden" name="redirect" value={redirect} />
+        <div>
+          <label for="password" class="field-label">Contraseña</label>
+          <input id="password" name="password" type="password" required class="field-input" autofocus />
+        </div>
+        <button type="submit" class="btn-primary w-full justify-center">Ingresar</button>
+      </form>
+    </div>
+  </body>
+</html>

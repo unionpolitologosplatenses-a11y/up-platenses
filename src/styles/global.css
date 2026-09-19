@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-semibold tracking-tight;
+  }
+  ::selection {
+    background-color: #1B7F6733;
+  }
+  a {
+    @apply transition-colors;
+  }
+  :focus-visible {
+    outline: 2px solid #1B7F67;
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    * {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Motivo gráfico institucional: una regla fina que enlaza los tres colores de acento,
+     evocando la idea de "unión" de disciplinas. Se usa como separador antes de títulos
+     de sección, nunca como decoración repetida en cada tarjeta. */
+  .up-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 3.25rem;
+  }
+  .up-rule span {
+    display: block;
+    height: 3px;
+    border-radius: 999px;
+  }
+  .up-rule .seg-1 { width: 1.5rem; background: #1B7F67; }
+  .up-rule .seg-2 { width: 0.85rem; background: #58BCD7; }
+  .up-rule .seg-3 { width: 0.5rem; background: #D81786; }
+
+  .container-up {
+    @apply mx-auto w-full max-w-6xl px-6 md:px-10;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-sm bg-esmeralda px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-esmeralda-dark;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 rounded-sm border border-ink/15 px-6 py-3 text-sm font-medium text-ink transition-colors hover:border-esmeralda hover:text-esmeralda;
+  }
+  .field-label {
+    @apply mb-1.5 block text-sm font-medium text-ink/80;
+  }
+  .field-input {
+    @apply w-full rounded-sm border border-ink/15 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink/35 focus:border-esmeralda focus:outline-none;
+  }
+}

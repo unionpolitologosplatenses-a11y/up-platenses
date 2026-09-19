@@ -1,0 +1,30 @@
+---
+export const prerender = false;
+import Layout from '../../layouts/Layout.astro';
+import NoteCard from '../../components/NoteCard.astro';
+import { getEnv, type Note } from '../../lib/db';
+
+const env = getEnv(Astro);
+const { results: notes } = await env.DB.prepare(
+  `SELECT * FROM notes WHERE status = 'published' ORDER BY note_date DESC`
+).all<Note>();
+---
+<Layout title="Notas" description="Notas y artículos sobre Ciencia Política y Relaciones Internacionales.">
+  <section class="container-up pt-16 md:pt-24">
+    <div class="up-rule mb-8"><span class="seg-1"></span><span class="seg-2"></span><span class="seg-3"></span></div>
+    <h1 class="max-w-2xl text-4xl leading-[1.1] text-ink md:text-5xl">Notas</h1>
+    <p class="mt-4 max-w-lg text-ink/65">
+      Artículos y análisis sobre Ciencia Política, Relaciones Internacionales y temas vinculados, escritos por miembros de la Unión.
+    </p>
+  </section>
+
+  <section class="container-up mt-16 mb-32">
+    {notes.length === 0 ? (
+      <p class="text-ink/50">Todavía no hay notas publicadas. Volvé pronto.</p>
+    ) : (
+      <div class="grid gap-x-8 gap-y-12 md:grid-cols-3">
+        {notes.map((note) => <NoteCard note={note} />)}
+      </div>
+    )}
+  </section>
+</Layout>
