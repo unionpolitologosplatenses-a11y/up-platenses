@@ -10,6 +10,8 @@
     "astro": "astro",
     "db:init": "wrangler d1 execute up_platenses --local --file=./schema.sql",
     "db:init:remote": "wrangler d1 execute up_platenses --remote --file=./schema.sql",
+    "db:migrate:categories": "wrangler d1 execute up_platenses --local --file=./migrations/001_add_note_category.sql",
+    "db:migrate:categories:remote": "wrangler d1 execute up_platenses --remote --file=./migrations/001_add_note_category.sql",
     "deploy": "astro build && wrangler pages deploy ./dist"
   },
   "dependencies": {
@@ -21,11 +23,5 @@
   "devDependencies": {
     "wrangler": "^3.90.0",
     "@cloudflare/workers-types": "^4.20241004.0"
-  },
-  "allowScripts": {
-    "esbuild@0.21.5": true,
-    "esbuild@0.17.19": true,
-    "sharp@0.33.5": true,
-    "workerd@1.20250718.0": true
   }
 }

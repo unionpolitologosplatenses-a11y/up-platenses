@@ -1,5 +1,14 @@
 import type { APIContext } from 'astro';
 
+export type NoteCategory = 'local' | 'nacional' | 'internacional' | 'otros';
+
+export const NOTE_CATEGORIES: { value: NoteCategory; label: string }[] = [
+  { value: 'local', label: 'Política Local' },
+  { value: 'nacional', label: 'Política Nacional' },
+  { value: 'internacional', label: 'Política Internacional' },
+  { value: 'otros', label: 'Otros' },
+];
+
 export interface Note {
   id: number;
   title: string;
@@ -9,6 +18,7 @@ export interface Note {
   image_key: string;
   excerpt: string;
   content: string;
+  category: NoteCategory;
   status: 'draft' | 'published';
   created_at: string;
   updated_at: string;
@@ -68,4 +78,16 @@ export function slugify(input: string): string {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .slice(0, 80);
+}
+
+/** Clases de color por categoría, usadas en las etiquetas (NoteCard, detalle de nota, admin). */
+export function categoryStyle(category: NoteCategory): { badge: string; label: string } {
+  const found = NOTE_CATEGORIES.find((c) => c.value === category) ?? NOTE_CATEGORIES[3];
+  const styles: Record<NoteCategory, string> = {
+    local: 'bg-celeste/15 text-celeste',
+    nacional: 'bg-esmeralda-light text-esmeralda',
+    internacional: 'bg-fucsia/10 text-fucsia',
+    otros: 'bg-ink/10 text-ink/60',
+  };
+  return { badge: styles[category] ?? styles.otros, label: found.label };
 }

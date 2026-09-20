@@ -1,9 +1,10 @@
 ---
 import { fileUrl } from '../lib/r2';
-import type { Note } from '../lib/db';
+import { categoryStyle, type Note } from '../lib/db';
 
 interface Props { note: Note }
 const { note } = Astro.props;
+const tag = categoryStyle(note.category);
 
 const dateFmt = new Date(note.note_date).toLocaleDateString('es-AR', {
   day: 'numeric', month: 'long', year: 'numeric',
@@ -20,7 +21,8 @@ const dateFmt = new Date(note.note_date).toLocaleDateString('es-AR', {
       />
     )}
   </div>
-  <p class="mt-4 text-xs text-ink/50">{dateFmt} {note.author && `· ${note.author}`}</p>
+  <span class:list={['mt-4 inline-block rounded-sm px-2 py-0.5 text-xs font-medium', tag.badge]}>{tag.label}</span>
+  <p class="mt-2 text-xs text-ink/50">{dateFmt} {note.author && `· ${note.author}`}</p>
   <h3 class="mt-1.5 text-lg font-medium leading-snug text-ink group-hover:text-esmeralda">
     {note.title}
   </h3>

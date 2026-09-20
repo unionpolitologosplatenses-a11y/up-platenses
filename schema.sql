@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS notes (
   image_key TEXT DEFAULT '',
   excerpt TEXT DEFAULT '',
   content TEXT NOT NULL DEFAULT '',
+  category TEXT NOT NULL DEFAULT 'otros', -- 'local' | 'nacional' | 'internacional' | 'otros'
   status TEXT NOT NULL DEFAULT 'draft', -- 'draft' | 'published'
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT DEFAULT CURRENT_TIMESTAMP

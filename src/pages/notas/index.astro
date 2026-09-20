@@ -2,12 +2,20 @@
 export const prerender = false;
 import Layout from '../../layouts/Layout.astro';
 import NoteCard from '../../components/NoteCard.astro';
-import { getEnv, type Note } from '../../lib/db';
+import { getEnv, NOTE_CATEGORIES, type Note, type NoteCategory } from '../../lib/db';
 
 const env = getEnv(Astro);
-const { results: notes } = await env.DB.prepare(
-  `SELECT * FROM notes WHERE status = 'published' ORDER BY note_date DESC`
-).all<Note>();
+
+const activeCategory = Astro.url.searchParams.get('categoria') as NoteCategory | null;
+const isValidCategory = activeCategory && NOTE_CATEGORIES.some((c) => c.value === activeCategory);
+
+const { results: notes } = isValidCategory
+  ? await env.DB.prepare(
+      `SELECT * FROM notes WHERE status = 'published' AND category = ? ORDER BY note_date DESC`
+    ).bind(activeCategory).all<Note>()
+  : await env.DB.prepare(
+      `SELECT * FROM notes WHERE status = 'published' ORDER BY note_date DESC`
+    ).all<Note>();
 ---
 <Layout title="Notas" description="Notas y artículos sobre Ciencia Política y Relaciones Internacionales.">
   <section class="container-up pt-16 md:pt-24">
@@ -16,11 +24,34 @@ const { results: notes } = await env.DB.prepare(
     <p class="mt-4 max-w-lg text-ink/65">
       Artículos y análisis sobre Ciencia Política, Relaciones Internacionales y temas vinculados, escritos por miembros de la Unión.
     </p>
+
+    <div class="mt-8 flex flex-wrap gap-2">
+      <a
+        href="/notas"
+        class:list={[
+          'rounded-sm border px-3.5 py-1.5 text-sm font-medium transition-colors',
+          !isValidCategory ? 'border-esmeralda bg-esmeralda text-white' : 'border-ink/15 text-ink/60 hover:border-esmeralda/40',
+        ]}
+      >
+        Todas
+      </a>
+      {NOTE_CATEGORIES.map((c) => (
+        <a
+          href={`/notas?categoria=${c.value}`}
+          class:list={[
+            'rounded-sm border px-3.5 py-1.5 text-sm font-medium transition-colors',
+            activeCategory === c.value ? 'border-esmeralda bg-esmeralda text-white' : 'border-ink/15 text-ink/60 hover:border-esmeralda/40',
+          ]}
+        >
+          {c.label}
+        </a>
+      ))}
+    </div>
   </section>
 
   <section class="container-up mt-16 mb-32">
     {notes.length === 0 ? (
-      <p class="text-ink/50">Todavía no hay notas publicadas. Volvé pronto.</p>
+      <p class="text-ink/50">No hay notas publicadas en esta categoría todavía.</p>
     ) : (
       <div class="grid gap-x-8 gap-y-12 md:grid-cols-3">
         {notes.map((note) => <NoteCard note={note} />)}

@@ -1,8 +1,10 @@
 import type { APIRoute } from 'astro';
-import { getEnv, slugify } from '../../../lib/db';
+import { getEnv, slugify, NOTE_CATEGORIES, type NoteCategory } from '../../../lib/db';
 import { uploadToR2 } from '../../../lib/r2';
 
 export const prerender = false;
+
+const VALID_CATEGORIES = new Set(NOTE_CATEGORIES.map((c) => c.value));
 
 export const POST: APIRoute = async (context) => {
   const env = getEnv(context);
@@ -14,6 +16,8 @@ export const POST: APIRoute = async (context) => {
   const excerpt = String(form.get('excerpt') || '').trim();
   const content = String(form.get('content') || '').trim();
   const status = form.get('status') === 'published' ? 'published' : 'draft';
+  const categoryRaw = String(form.get('category') || 'otros');
+  const category: NoteCategory = VALID_CATEGORIES.has(categoryRaw as NoteCategory) ? (categoryRaw as NoteCategory) : 'otros';
   const image = form.get('image') as File | null;
 
   if (!title || !noteDate) {
@@ -30,9 +34,9 @@ export const POST: APIRoute = async (context) => {
   }
 
   await env.DB.prepare(
-    `INSERT INTO notes (title, slug, author, note_date, image_key, excerpt, content, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-  ).bind(title, slug, author, noteDate, imageKey, excerpt, content, status).run();
+    `INSERT INTO notes (title, slug, author, note_date, image_key, excerpt, content, category, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(title, slug, author, noteDate, imageKey, excerpt, content, category, status).run();
 
   return context.redirect('/admin/notas?created=1');
 };

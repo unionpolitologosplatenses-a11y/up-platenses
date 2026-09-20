@@ -1,8 +1,10 @@
 import type { APIRoute } from 'astro';
-import { getEnv, type Note } from '../../../../lib/db';
+import { getEnv, type Note, NOTE_CATEGORIES, type NoteCategory } from '../../../../lib/db';
 import { uploadToR2, deleteFromR2 } from '../../../../lib/r2';
 
 export const prerender = false;
+
+const VALID_CATEGORIES = new Set(NOTE_CATEGORIES.map((c) => c.value));
 
 export const POST: APIRoute = async (context) => {
   const env = getEnv(context);
@@ -18,6 +20,8 @@ export const POST: APIRoute = async (context) => {
   const excerpt = String(form.get('excerpt') || '').trim();
   const content = String(form.get('content') || '').trim();
   const status = form.get('status') === 'published' ? 'published' : 'draft';
+  const categoryRaw = String(form.get('category') || existing.category);
+  const category: NoteCategory = VALID_CATEGORIES.has(categoryRaw as NoteCategory) ? (categoryRaw as NoteCategory) : 'otros';
   const image = form.get('image') as File | null;
 
   let imageKey = existing.image_key;
@@ -27,9 +31,9 @@ export const POST: APIRoute = async (context) => {
   }
 
   await env.DB.prepare(
-    `UPDATE notes SET title=?, author=?, note_date=?, image_key=?, excerpt=?, content=?, status=?, updated_at=CURRENT_TIMESTAMP
+    `UPDATE notes SET title=?, author=?, note_date=?, image_key=?, excerpt=?, content=?, category=?, status=?, updated_at=CURRENT_TIMESTAMP
      WHERE id=?`
-  ).bind(title, author, noteDate, imageKey, excerpt, content, status, id).run();
+  ).bind(title, author, noteDate, imageKey, excerpt, content, category, status, id).run();
 
   return context.redirect('/admin/notas?updated=1');
 };
