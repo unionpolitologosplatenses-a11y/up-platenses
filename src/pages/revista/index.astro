@@ -9,13 +9,32 @@ const { results: editions } = await env.DB.prepare(
   `SELECT * FROM editions WHERE status = 'published' ORDER BY year DESC, number DESC`
 ).all<Edition>();
 ---
-<Layout title="Revista" description="Revista académica de la Unión de Politólogos Platenses.">
+<Layout title="Pensare Krítikos" description="Pensare Krítikos, revista académica de la Unión de Politólogos Platenses.">
   <section class="container-up pt-16 md:pt-24">
     <div class="up-rule mb-8"><span class="seg-1"></span><span class="seg-2"></span><span class="seg-3"></span></div>
-    <h1 class="max-w-2xl text-4xl leading-[1.1] text-ink md:text-5xl">Revista <span class="text-celeste">UP</span></h1>
+    <h1 class="max-w-2xl text-4xl leading-[1.1] text-ink md:text-5xl">Pensare <span class="text-celeste">Krítikos</span></h1>
     <p class="mt-4 max-w-lg text-ink/65">
-      Publicación académica de la Unión de Politólogos Platenses. Todas las ediciones disponibles para leer en línea o descargar.
+      Revista académica de la Unión de Politólogos Platenses. Todas las ediciones disponibles para leer en línea o descargar.
     </p>
+  </section>
+
+  <section class="container-up mt-12">
+    <div class="flex flex-wrap items-center justify-between gap-5 rounded-sm border border-ink/10 bg-esmeralda-light/50 px-7 py-6">
+      <div>
+        <p class="text-sm font-semibold text-esmeralda">Pautas para autores</p>
+        <p class="mt-1 max-w-md text-sm text-ink/65">
+          Normas de formato, extensión y citado para quienes quieran enviar un artículo a Pensare Krítikos.
+        </p>
+      </div>
+      <a
+        href="https://docs.google.com/document/d/1G8-mbeAOCHUoXnOo_5LL5wDBV2KPkkCR/edit?usp=sharing&ouid=108466792469751671658&rtpof=true&sd=true"
+        target="_blank"
+        rel="noopener"
+        class="btn-primary flex-shrink-0"
+      >
+        Ver pautas para autores
+      </a>
+    </div>
   </section>
 
   <section class="container-up mt-16 mb-32">

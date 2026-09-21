@@ -9,7 +9,7 @@ pages_build_output_dir = "./dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "up_platenses"
-database_id = "5d25fbd1-6ecf-4739-a8c2-f3393b379ff4"
+database_id = "REEMPLAZAR_CON_TU_DATABASE_ID"
 
 # Bucket R2: guarda las imágenes de notas, portadas y PDFs de la revista.
 # Crear con: wrangler r2 bucket create up-platenses-files
