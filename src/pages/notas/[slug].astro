@@ -19,7 +19,10 @@ const tag = categoryStyle(note.category);
 const dateFmt = new Date(note.note_date).toLocaleDateString('es-AR', {
   day: 'numeric', month: 'long', year: 'numeric',
 });
-const paragraphs = note.content.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+// Las notas creadas con el editor visual guardan HTML; las notas antiguas
+// guardan texto plano con párrafos separados por líneas en blanco.
+const isHtml = /<[a-z][\s\S]*>/i.test(note.content);
+const plainParagraphs = isHtml ? [] : note.content.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
 ---
 <Layout title={note.title} description={note.excerpt || note.title}>
   <article class="container-up pt-16 md:pt-24">
@@ -38,9 +41,13 @@ const paragraphs = note.content.split(/\n{2,}/).map((p) => p.trim()).filter(Bool
     )}
 
     <div class="mx-auto mt-10 max-w-prose pb-32">
-      {paragraphs.map((p) => (
-        <p class="mb-5 text-base leading-relaxed text-ink/80">{p}</p>
-      ))}
+      {isHtml ? (
+        <div class="note-content" set:html={note.content} />
+      ) : (
+        plainParagraphs.map((p) => (
+          <p class="mb-5 text-base leading-relaxed text-ink/80">{p}</p>
+        ))
+      )}
     </div>
   </article>
 </Layout>

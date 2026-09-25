@@ -9,8 +9,22 @@ const { id } = Astro.params;
 const note = await env.DB.prepare('SELECT * FROM notes WHERE id = ?').bind(id).first<Note>();
 
 if (!note) return Astro.redirect('/admin/notas');
+
+// Las notas cargadas antes de tener el editor visual guardan texto plano
+// (párrafos separados por líneas en blanco). Las convertimos a HTML simple
+// para que el editor las muestre igual que antes. Si el contenido ya es
+// HTML (porque se editó con el editor visual), se usa tal cual.
+const isAlreadyHtml = /<[a-z][\s\S]*>/i.test(note.content);
+const editorInitialHtml = isAlreadyHtml
+  ? note.content
+  : note.content
+      .split(/\n{2,}/)
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .map((p) => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+      .join('');
 ---
-<AdminLayout title={`Editar — ${note.title}`}>
+<AdminLayout title={`Editar — ${note.title}`} richEditor>
   <a href="/admin/notas" class="text-sm text-ink/50 hover:text-esmeralda">← Notas</a>
   <h1 class="mt-3 text-2xl font-semibold">Editar nota</h1>
 
@@ -55,8 +69,10 @@ if (!note) return Astro.redirect('/admin/notas');
     </div>
 
     <div>
-      <label for="content" class="field-label">Contenido</label>
-      <textarea id="content" name="content" rows="14" required class="field-input">{note.content}</textarea>
+      <label class="field-label">Contenido</label>
+      <div id="editor-container" class="min-h-[320px] rounded-sm bg-white"></div>
+      <input type="hidden" id="content-input" name="content" required />
+      <template id="editor-initial-content" set:html={editorInitialHtml} />
     </div>
 
     <div>
@@ -69,4 +85,36 @@ if (!note) return Astro.redirect('/admin/notas');
 
     <button type="submit" class="btn-primary">Guardar cambios</button>
   </form>
+
+  <script is:inline src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', function () {
+      var quill = new Quill('#editor-container', {
+        theme: 'snow',
+        placeholder: 'Escribí el contenido de la nota…',
+        modules: {
+          toolbar: [
+            [{ header: [2, 3, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['blockquote', 'link'],
+            ['clean'],
+          ],
+        },
+      });
+      var initialHtml = document.getElementById('editor-initial-content').innerHTML;
+      if (initialHtml && initialHtml.trim()) {
+        quill.clipboard.dangerouslyPasteHTML(initialHtml);
+      }
+      var hiddenInput = document.getElementById('content-input');
+      var form = hiddenInput.closest('form');
+      form.addEventListener('submit', function (e) {
+        hiddenInput.value = quill.root.innerHTML;
+        if (quill.getText().trim().length === 0) {
+          e.preventDefault();
+          alert('El contenido de la nota no puede estar vacío.');
+        }
+      });
+    });
+  </script>
 </AdminLayout>

@@ -6,7 +6,7 @@ import { NOTE_CATEGORIES } from '../../../lib/db';
 const error = Astro.url.searchParams.get('error');
 const today = new Date().toISOString().slice(0, 10);
 ---
-<AdminLayout title="Nueva nota">
+<AdminLayout title="Nueva nota" richEditor>
   <a href="/admin/notas" class="text-sm text-ink/50 hover:text-esmeralda">← Notas</a>
   <h1 class="mt-3 text-2xl font-semibold">Nueva nota</h1>
 
@@ -49,8 +49,9 @@ const today = new Date().toISOString().slice(0, 10);
     </div>
 
     <div>
-      <label for="content" class="field-label">Contenido</label>
-      <textarea id="content" name="content" rows="12" required class="field-input" placeholder="Separá los párrafos con una línea en blanco."></textarea>
+      <label class="field-label">Contenido</label>
+      <div id="editor-container" class="min-h-[320px] rounded-sm bg-white"></div>
+      <input type="hidden" id="content-input" name="content" required />
     </div>
 
     <div>
@@ -63,4 +64,32 @@ const today = new Date().toISOString().slice(0, 10);
 
     <button type="submit" class="btn-primary">Guardar nota</button>
   </form>
+
+  <script is:inline src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', function () {
+      var quill = new Quill('#editor-container', {
+        theme: 'snow',
+        placeholder: 'Escribí el contenido de la nota…',
+        modules: {
+          toolbar: [
+            [{ header: [2, 3, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['blockquote', 'link'],
+            ['clean'],
+          ],
+        },
+      });
+      var hiddenInput = document.getElementById('content-input');
+      var form = hiddenInput.closest('form');
+      form.addEventListener('submit', function (e) {
+        hiddenInput.value = quill.root.innerHTML;
+        if (quill.getText().trim().length === 0) {
+          e.preventDefault();
+          alert('El contenido de la nota no puede estar vacío.');
+        }
+      });
+    });
+  </script>
 </AdminLayout>

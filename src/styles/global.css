@@ -68,4 +68,36 @@
   .field-input {
     @apply w-full rounded-sm border border-ink/15 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink/35 focus:border-esmeralda focus:outline-none;
   }
+
+  /* Contenido de las notas cargado con el editor visual del admin. */
+  .note-content {
+    @apply text-base leading-relaxed text-ink/80;
+  }
+  .note-content p {
+    @apply mb-5;
+  }
+  .note-content h2 {
+    @apply mb-4 mt-10 text-2xl font-semibold text-ink;
+  }
+  .note-content h3 {
+    @apply mb-3 mt-8 text-xl font-semibold text-ink;
+  }
+  .note-content strong {
+    @apply font-semibold text-ink;
+  }
+  .note-content em {
+    @apply italic;
+  }
+  .note-content a {
+    @apply text-esmeralda underline underline-offset-2 hover:text-esmeralda-dark;
+  }
+  .note-content ul {
+    @apply mb-5 list-disc space-y-1.5 pl-6;
+  }
+  .note-content ol {
+    @apply mb-5 list-decimal space-y-1.5 pl-6;
+  }
+  .note-content blockquote {
+    @apply my-6 border-l-2 border-fucsia/40 pl-5 italic text-ink/65;
+  }
 }
